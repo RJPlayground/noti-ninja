@@ -57,3 +57,45 @@ Services expected to run locally:
 
 ## Contribution
 The project is a playground — contributions, experiments and PRs that add tooling, examples or automation are welcome. Add issues for experiments you want to try and document findings in the repo.
+
+## Monorepo layout
+
+This repository is organized as a monorepo containing the Android app, backend services, DB migrations (Liquibase), Terraform infra, CI/CD templates and other DevOps tooling. The structure below is a suggested starter layout — each package should include its own README, Dockerfile, build script and tests.
+
+noti-ninja/
+├── apps/
+│   ├── android/                  # Android app (Gradle project)
+│   │   ├── app/
+│   │   └── build.gradle, README.md
+│   └── web/                      # optional web/admin UI
+├── services/
+│   ├── api/                      # REST / GraphQL service
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   ├── Makefile
+│   │   └── README.md
+│   ├── ingestor/                 # ingestion service
+│   ├── worker/                   # async processors / consumers
+│   └── libs/                     # language-shared libs (auth, telemetry)
+├── infra/
+│   ├── terraform/                # cloud infra (network, infra resources)
+│   ├── k8s/
+│   │   ├── charts/               # Helm charts (per-service or umbrella)
+│   │   └── manifests/            # raw manifests / kustomize overlays
+│   ├── db/
+│   │   └── liquibase/            # changelogs + migration tooling
+│   └── secrets/                  # SOPS / sealed secrets examples (no secrets checked in)
+├── ci/                           # reusable CI scripts and pipeline templates
+│   └── pipeline-templates/
+├── .github/
+│   └── workflows/                 # GitHub Actions workflows that call ci/
+├── scripts/                       # developer helper scripts (local setup)
+├── tools/                         # auxiliary tools (local test harnesses, devops helpers)
+├── charts/                        # umbrella helm or examples
+├── docs/                          # architecture, runbook, onboarding docs
+├── tests/                         # e2e / integration test suites (can mount k8s kind clusters)
+├── build/                         # optional artifact output (ignored in git)
+├── LICENSE
+└── README.md
+
+Add per-package README files and small CI workflow stubs so CI can target only changed areas. Keep secrets out of the repo; use SOPS/sealed secrets for examples and guidance instead.

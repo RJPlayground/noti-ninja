@@ -1,0 +1,8 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Add per-package jobs or call scripts in ci/pipeline-templates/"
