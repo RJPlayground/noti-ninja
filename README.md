@@ -60,8 +60,11 @@ The project is a playground — contributions, experiments and PRs that add tool
 
 ## Monorepo layout
 
-This repository is organized as a monorepo containing the Android app, backend services, DB migrations (Liquibase), Terraform infra, CI/CD templates and other DevOps tooling. The structure below is a suggested starter layout — each package should include its own README, Dockerfile, build script and tests.
+This repository is organized as a monorepo containing the Android app, backend services, DB migrations (Liquibase), Terraform infra, CI/CD templates and other DevOps tooling.
 
+The ASCII tree below is wrapped in a code block so it renders consistently in previews. A short markdown list follows for cleaner rendering in some UI previews.
+
+```text
 noti-ninja/
 ├── apps/
 │   ├── android/                  # Android app (Gradle project)
@@ -87,15 +90,22 @@ noti-ninja/
 │   └── secrets/                  # SOPS / sealed secrets examples (no secrets checked in)
 ├── ci/                           # reusable CI scripts and pipeline templates
 │   └── pipeline-templates/
-├── .github/
-│   └── workflows/                 # GitHub Actions workflows that call ci/
-├── scripts/                       # developer helper scripts (local setup)
-├── tools/                         # auxiliary tools (local test harnesses, devops helpers)
-├── charts/                        # umbrella helm or examples
-├── docs/                          # architecture, runbook, onboarding docs
-├── tests/                         # e2e / integration test suites (can mount k8s kind clusters)
-├── build/                         # optional artifact output (ignored in git)
+├── .github/                      # workflows and GitHub configs
+├── scripts/                      # developer helper scripts (local setup)
+├── tools/                        # auxiliary tools (local test harnesses, devops helpers)
+├── charts/                       # umbrella helm or examples
+├── docs/                         # architecture, runbook, onboarding docs
+├── tests/                        # e2e / integration test suites
+├── build/                        # optional artifact output (ignored in git)
 ├── LICENSE
 └── README.md
+```
+
+Top-level summary (markdown-friendly):
+- apps/ — mobile and web clients (android, web)
+- services/ — backend services (api, ingestor, worker, libs)
+- infra/ — terraform, k8s manifests/charts, db migrations (liquibase), secrets examples
+- ci/ and .github/ — CI templates and workflows
+- scripts/, tools/, charts/, docs/, tests/, build/ — helpers, docs and test harnesses
 
 Add per-package README files and small CI workflow stubs so CI can target only changed areas. Keep secrets out of the repo; use SOPS/sealed secrets for examples and guidance instead.
