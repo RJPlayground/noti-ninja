@@ -1,29 +1,19 @@
-name: Local Kind - test
+name: local-kind-min
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch: {}
 
 jobs:
-  test-on-kind:
+  test:
     runs-on:
       - self-hosted
       - Moshe-runner
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/[email protected]
 
-      - name: Show runner info
+      - name: Say hi
         run: |
-          echo "Hostname: $(hostname)"
-          echo "User: $(whoami)"
-          docker version || echo "docker not installed?"
-
-      - name: Check kind cluster
-        run: |
-          kubectl config current-context || echo "no current context"
-          kubectl get nodes
-          kubectl get pods -A || true
-
+          echo "Hello from $(hostname)"
+          kubectl get nodes || echo "kubectl failed"
