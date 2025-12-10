@@ -1,0 +1,33 @@
+name: Local Kind – test
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  test-on-kind:
+    runs-on:
+      - self-hosted
+      - Moshe-runner       # this is the label you see in the UI
+
+    # If you need to point to a specific kubeconfig file, uncomment:
+    # env:
+    #   KUBECONFIG: /home/<runner_user>/.kube/config
+
+    steps:
+      - name: Checkout code
+        uses: actions/[email protected]
+
+      - name: Show runner info
+        run: |
+          echo "Hostname: $(hostname)"
+          echo "User: $(whoami)"
+          docker version || echo "docker not installed?"
+
+      - name: Check kind cluster
+        run: |
+          kubectl config current-context || echo "no current context"
+          kubectl get nodes
+          kubectl get pods -A || true
+
