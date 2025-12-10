@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on:
       - self-hosted
-      - Moshe-runner
+      - Moshe-runner ## my runner
 
     steps:
       - name: Checkout
