@@ -1,4 +1,4 @@
-name: Local Kind – test
+name: Local Kind - test
 
 on:
   push:
@@ -9,11 +9,7 @@ jobs:
   test-on-kind:
     runs-on:
       - self-hosted
-      - Moshe-runner       # this is the label you see in the UI
-
-    # If you need to point to a specific kubeconfig file, uncomment:
-    # env:
-    #   KUBECONFIG: /home/<runner_user>/.kube/config
+      - Moshe-runner
 
     steps:
       - name: Checkout code
