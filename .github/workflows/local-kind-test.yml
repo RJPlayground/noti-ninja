@@ -1,19 +1,28 @@
-name: local-kind-min
-
-on:
-  workflow_dispatch: {}
-
 jobs:
-  test:
+  test-on-kind:
     runs-on:
       - self-hosted
-      - Moshe-runner ## my runner
+      - Moshe-runner
 
     steps:
       - name: Checkout
         uses: actions/[email protected]
 
-      - name: Say hi
+      - name: Show runner info
         run: |
-          echo "Hello from $(hostname)"
-          kubectl get nodes || echo "kubectl failed"
+          echo "Hostname: $(hostname)"
+          echo "User: $(whoami)"
+
+      - name: Check kind cluster
+        run: |
+          kubectl config current-context || echo "no current context"
+          kubectl get nodes
+          kubectl get pods -A || true
+
+      - name: Deploy to kind
+        run: |
+          kubectl apply -f k8s/
+          kubectl rollout status deployment/my-app --timeout=120s
+
+      - name: Run integration tests
+        run: ./scripts/run-tests.sh
