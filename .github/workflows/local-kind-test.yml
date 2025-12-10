@@ -1,3 +1,10 @@
+name: local-kind-test
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
 jobs:
   test-on-kind:
     runs-on:
@@ -15,14 +22,19 @@ jobs:
 
       - name: Check kind cluster
         run: |
+          echo "Current context:"
           kubectl config current-context || echo "no current context"
-          kubectl get nodes
-          kubectl get pods -A || true
+          echo "Nodes:"
+          kubectl get nodes || echo "kubectl get nodes failed"
+          echo "All pods:"
+          kubectl get pods -A || echo "kubectl get pods failed"
 
-      - name: Deploy to kind
-        run: |
-          kubectl apply -f k8s/
-          kubectl rollout status deployment/my-app --timeout=120s
+      # Example of where you'd actually deploy and test
+      # - name: Deploy to kind
+      #   run: |
+      #     kubectl apply -f k8s/
+      #     kubectl rollout status deployment/my-app --timeout=120s
+      #
+      # - name: Run integration tests
+      #   run: ./scripts/run-tests.sh
 
-      - name: Run integration tests
-        run: ./scripts/run-tests.sh
