@@ -2,14 +2,13 @@ name: local-kind-test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ test-local-runner ]
   workflow_dispatch: {}
 
 jobs:
   test-on-kind:
     runs-on:
-      - self-hosted
-      - Moshe-runner
+      - Moshe-runner //
 
     steps:
       - name: Show runner info
