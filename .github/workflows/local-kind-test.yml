@@ -12,9 +12,6 @@ jobs:
       - Moshe-runner
 
     steps:
-      - name: Checkout
-        uses: actions/[email protected]
-
       - name: Show runner info
         run: |
           echo "Hostname: $(hostname)"
@@ -28,13 +25,4 @@ jobs:
           kubectl get nodes || echo "kubectl get nodes failed"
           echo "All pods:"
           kubectl get pods -A || echo "kubectl get pods failed"
-
-      # Example of where you'd actually deploy and test
-      # - name: Deploy to kind
-      #   run: |
-      #     kubectl apply -f k8s/
-      #     kubectl rollout status deployment/my-app --timeout=120s
-      #
-      # - name: Run integration tests
-      #   run: ./scripts/run-tests.sh
 
