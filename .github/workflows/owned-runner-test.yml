@@ -5,11 +5,13 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+
 jobs:
   build:
     runs-on:
       - self-hosted
       - ${{ format('user-{0}', github.actor) }}
+
 
     steps:
       - name: Checkout
