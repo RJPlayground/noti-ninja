@@ -2,14 +2,14 @@ name: CI on user runner
 
 on:
   push:
-    branches: [ cicd-local-runners-test ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on:
       - self-hosted
-      - ${{ 'user-' + github.actor }}
+      - ${{ format('user-{0}', github.actor) }}
 
     steps:
       - name: Checkout
