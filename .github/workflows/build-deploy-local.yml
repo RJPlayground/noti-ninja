@@ -1,0 +1,48 @@
+name: Build & Deploy to local kind
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: noti-ninja-ingestor
+  CLUSTER_NAME: my-cluster
+  NAMESPACE: noti-ninja
+
+jobs:
+  build-deploy:
+    # runs on your self-hosted runner that has docker/kind/kubectl installed
+    runs-on: [self-hosted, linux, local]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
+
+      - name: Build docker image
+        run: |
+          docker build -t $IMAGE_NAME:${IMAGE_TAG} services/ingestor
+
+      - name: Load image into kind cluster
+        run: |
+          # ensure you specify the correct kind cluster name
+          kind load docker-image ${IMAGE_NAME}:${IMAGE_TAG} --name ${CLUSTER_NAME}
+
+      - name: Apply manifests (create ns if needed)
+        run: |
+          kubectl --context "kind-${CLUSTER_NAME}" apply -f infra/k8s/manifests/namespace.yaml || true
+          # Ensure imagePullPolicy allows using local images (IfNotPresent/Never). We'll patch image below.
+          kubectl --context "kind-${CLUSTER_NAME}" -n ${NAMESPACE} apply -f infra/k8s/manifests/ingestor-deployment.yaml
+
+      - name: Update deployment image and rollout
+        run: |
+          kubectl --context "kind-${CLUSTER_NAME}" -n ${NAMESPACE} set image deployment/ingestor ingestor=${IMAGE_NAME}:${IMAGE_TAG} --record
+          kubectl --context "kind-${CLUSTER_NAME}" -n ${NAMESPACE} rollout status deployment/ingestor --timeout=120s
+
+      - name: Smoke test / health
+        run: |
+          kubectl --context "kind-${CLUSTER_NAME}" -n ${NAMESPACE} port-forward svc/ingestor 8082:8082 &
+          sleep 1
+          curl -sS http://127.0.0.1:8082/health
