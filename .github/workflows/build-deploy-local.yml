@@ -12,7 +12,6 @@ env:
 
 jobs:
   build-deploy:
-    # runs on your self-hosted runner that has docker/kind/kubectl installed
     runs-on: [ self-hosted, ${{ 'user-' + github.actor }} ]
     steps:
       - name: Checkout
