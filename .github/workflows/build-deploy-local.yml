@@ -2,7 +2,7 @@ name: Build & Deploy to local kind
 
 on:
   push:
-    branches: [ main ]
+    branches: [ cicd-local-runners-test ]
   workflow_dispatch:
 
 env:
