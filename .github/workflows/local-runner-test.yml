@@ -2,7 +2,7 @@ name: CI on user runner
 
 on:
   push:
-    branches: [ main ]
+    branches: [ ]
   workflow_dispatch:
 
 jobs:
