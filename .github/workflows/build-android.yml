@@ -41,13 +41,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: alertmate-debug-${{ github.sha }}
-          path: apps/android/AlertMate/app/build/outputs/apk/debug/*. apk
+          path: apps/android/AlertMate/app/build/outputs/apk/debug/*.apk
           retention-days:  30
       
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: alertmate-release-${{ github. sha }}
+          name: alertmate-release-${{ github.sha }}
           path: apps/android/AlertMate/app/build/outputs/apk/release/*.apk
           retention-days: 30
       
