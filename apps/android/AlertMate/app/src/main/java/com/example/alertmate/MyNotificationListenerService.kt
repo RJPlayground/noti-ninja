@@ -22,18 +22,29 @@ class MyNotificationListenerService : NotificationListenerService() {
     private val client = OkHttpClient()
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    companion object {
-        // Updated to use the correct local IP for the physical device.
-        private const val SERVER_URL = "http://192.168.68.124:8082/ingest"
+    override fun onCreate() {
+        super.onCreate()
+        NotificationRepository.init(applicationContext)
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
         if (sbn != null && sbn.packageName != applicationContext.packageName) {
+            val packageName = sbn.packageName
             val notification = sbn.notification
             val extras = notification.extras
             val title = extras.getString(Notification.EXTRA_TITLE) ?: ""
             val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
+
+            // Update local repository for UI
+            NotificationRepository.incrementCount(packageName)
+
+            // Check if server URL is configured
+            val serverUrl = NotificationRepository.serverUrl.value
+            if (serverUrl.isBlank()) {
+                Log.d(TAG, "Server URL is empty, skipping sending.")
+                return
+            }
 
             // Create the nested payload object
             val payload = JSONObject()
@@ -47,23 +58,23 @@ class MyNotificationListenerService : NotificationListenerService() {
             val notificationData = JSONObject()
             notificationData.put("id", sbn.key)
             notificationData.put("deviceId", deviceId)
-            notificationData.put("source", sbn.packageName)
+            notificationData.put("source", packageName)
             notificationData.put("type", "notification")
             notificationData.put("timestamp", sbn.postTime)
             notificationData.put("payload", payload)
 
-            Log.d(TAG, "Sending notification to server: ${notificationData.toString()}")
-            sendNotificationToServer(notificationData.toString())
+            Log.d(TAG, "Sending notification to server: $serverUrl")
+            sendNotificationToServer(notificationData.toString(), serverUrl)
         }
     }
 
-    private fun sendNotificationToServer(json: String) {
+    private fun sendNotificationToServer(json: String, url: String) {
         serviceScope.launch {
             try {
                 val body = json.toRequestBody("application/json; charset=utf-8".toMediaType())
 
                 val request = Request.Builder()
-                    .url(SERVER_URL)
+                    .url(url)
                     .post(body)
                     .build()
 
@@ -75,7 +86,7 @@ class MyNotificationListenerService : NotificationListenerService() {
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error sending notification to server. Ensure server is running at $SERVER_URL", e)
+                Log.e(TAG, "Error sending notification to server at $url", e)
             }
         }
     }
