@@ -31,11 +31,11 @@ jobs:
       
       - name: Build Debug APK
         working-directory:  apps/android/AlertMate
-        run: ./AlertMate/gradlew assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
       
       - name: Build Release APK
         working-directory: apps/android/AlertMate
-        run:  ./AlertMate/gradlew assembleRelease --no-daemon --stacktrace
+        run:  ./gradlew assembleRelease --no-daemon --stacktrace
       
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
