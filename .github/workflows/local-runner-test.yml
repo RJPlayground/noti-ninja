@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    # Compose the user-specific label: "user-<github actor>"
     runs-on: [ self-hosted, ${{ 'user-' + github.actor }} ]
 
     steps:
