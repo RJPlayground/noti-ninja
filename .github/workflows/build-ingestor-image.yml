@@ -1,0 +1,70 @@
+name: Build Ingestor Docker Image
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'services/ingestor/**'
+      - '.github/workflows/build-ingestor-image.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'services/ingestor/**'
+      - '.github/workflows/build-ingestor-image.yml'
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: noti-ninja-ingestor
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: services/ingestor
+          push: false
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Save Docker image as tar
+        run: |
+          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -o ingestor-image.tar
+          gzip ingestor-image.tar
+          ls -lh ingestor-image.tar.gz
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingestor-docker-image
+          path: ingestor-image.tar.gz
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Output artifact info
+        run: |
+          echo "Docker image built and uploaded successfully!"
+          echo "Image: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          echo "Artifact name: ingestor-docker-image"
+          echo "To download locally, use:"
+          echo "  1. Go to the Actions tab"
+          echo "  2. Find this workflow run"
+          echo "  3. Download 'ingestor-docker-image' artifact"
+          echo "  4. Decompress: tar -xzf ingestor-image.tar.gz"
+          echo "  5. Load: docker load -i ingestor-image.tar"
